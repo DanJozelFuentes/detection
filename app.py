@@ -17,23 +17,19 @@ if uploaded_file is not None:
 
     image = Image.open(uploaded_file)
 
-    st.image(image, caption="Uploaded Image", use_container_width=True)
+    st.image(image, caption="Uploaded Image", width='stretch')
 
     temp_file = tempfile.NamedTemporaryFile(delete=False, suffix=".jpg")
-    temp_file.write(uploaded_file.read())
-    temp_file.close()
+
+    image.save(temp_file.name)
 
     results = model.predict(
         source=temp_file.name,
-        conf=0.25,
-        save=True
+        conf=0.25
     )
 
-    output_path = results[0].save_dir
-    output_image = os.path.join(
-        output_path,
-        os.path.basename(temp_file.name)
-    )
+    result_image = results[0].plot()
 
     st.subheader("Detection Result")
-    st.image(output_image, use_container_width=True)
+
+    st.image(result_image, width='stretch')
